@@ -4,6 +4,25 @@ from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied
 from .models import Post
 from .serializers import Postserilizer
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.core.mail import send_mail
+from django.conf import settings
+
+class SendEmailAPI(APIView):
+    def post(self, request):
+        subject = 'Test Email'
+        message = 'This is a test email sent from Django API.'
+        from_email = settings.EMAIL_HOST_USER
+        recipient_list = ['recipient@example.com']  # Replace with a valid email address
+        
+        try:
+            send_mail(subject, message, from_email, recipient_list)
+            return Response({'message': 'Email sent successfully!'}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 class PostListCreateView(generics.ListCreateAPIView):
     queryset = Post.objects.all()
